@@ -4,7 +4,7 @@ import { useCategories } from '@/hooks/api/useCategories';
 import { useProducts } from '@/hooks/api/useProducts';
 import { IProduct } from '@/utils/type/product';
 import useMediaQuery from '@/hooks/useMediaQuery';
-import { Table, Pagination, Card, Select, InputNumber } from 'antd';
+import { Table, Pagination, Card, Select, InputNumber, theme } from 'antd';
 import { Input } from 'antd';
 import type { PaginationProps, TableProps } from 'antd';
 import { ColumnsType } from 'antd/es/table';
@@ -15,6 +15,9 @@ import { FormGroup } from '@/components/Form/FormGroup';
 import { Label } from '@/components/Form/Label';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQueryParam } from '@/hooks/useQueryParam';
+import { Column } from '@ant-design/plots';
+
+const { useToken } = theme;
 
 const columns: ColumnsType<IProduct> = [
     {
@@ -71,6 +74,7 @@ export default function Products() {
     const maxPriceFilter = getSearchParams('maxPrice');
 
     const isMD = useMediaQuery('(min-width: 768px)');
+    const { token } = useToken();
 
     const { data: products, isLoading } = useProducts({
         page,
@@ -134,6 +138,23 @@ export default function Products() {
         } else return []
     }, [allProducts]);
 
+    const chartData = useMemo(() => {
+        if (allProducts?.products?.length) {
+            const counts = allProducts?.products?.reduce((a: { [key: string]: number }, b) => {
+                const name = b.brand;
+                if (!a.hasOwnProperty(name)) {
+                    a[name] = 0;
+                }
+                a[name]++;
+                return a;
+            }, {});
+
+            const countsExtended = Object.keys(counts).map(i => ({ brand: i, count: counts[i] }));
+
+            return countsExtended;
+        } else return []
+    }, [allProducts]);
+
     const handleReplaceParams = (query: string) => {
         router.replace(pathname + '?' + query, { scroll: false });
     }
@@ -185,6 +206,29 @@ export default function Products() {
                 <h1 className="text-xl font-bold mt-5 mb-10 text-indigo-800">
                     Products
                 </h1>
+                <Column
+                    data={chartData}
+                    xField="brand"
+                    yField="count"
+                    xAxis={{
+                        label: {
+                            autoHide: false,
+                            autoRotate: true,
+                        },
+                    }}
+                    label={{
+                        position: 'middle',
+                        style: {
+                            fill: '#FFFFFF'
+                        },
+                    }}
+                    scrollbar={{
+                        type: 'horizontal'
+                    }}
+                    color={token.colorPrimary}
+                />
+            </Card>
+            <Card>
                 <div>
                     <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10">
                         <FormGroup>
