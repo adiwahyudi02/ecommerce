@@ -3,7 +3,7 @@ import { BsCart2, BsCardList } from 'react-icons/bs';
 export const sidebarRoute = [
     {
         title: 'Products',
-        route: '/',
+        route: '/products',
         icon: <BsCardList />
     },
     {
