@@ -11,7 +11,7 @@ export default function SidebarItem() {
     return (
         <ul className="flex flex-col gap-2">
             {sidebarRoute.map(item => (
-                <li>
+                <li key={item.route}>
                     <Link
                         href={item.route}
                         className="group"
