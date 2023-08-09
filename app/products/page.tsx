@@ -9,10 +9,12 @@ import { Input } from 'antd';
 import type { PaginationProps, TableProps } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { Key, SortOrder, SorterResult } from 'antd/es/table/interface';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { ExpandItem } from '@/components/Table/ExpandItem';
 import { FormGroup } from '@/components/Form/FormGroup';
 import { Label } from '@/components/Form/Label';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useQueryParam } from '@/hooks/useQueryParam';
 
 const columns: ColumnsType<IProduct> = [
     {
@@ -52,16 +54,21 @@ const columns: ColumnsType<IProduct> = [
 ];
 
 export default function Products() {
-    const [search, setSearch] = useState('');
-    const [categorieFilter, setCategorieFilter] = useState('');
-    const [brandFilter, setBrandFilter] = useState('');
-    const [productFilter, setProductFilter] = useState('');
-    const [minPriceFilter, setMinPriceFilter] = useState<number | null>(null);
-    const [maxPriceFilter, setMaxPriceFilter] = useState<number | null>(null);
     const [sortDirection, setSortDirection] = useState<SortOrder | undefined>();
     const [sortField, setSortField] = useState<Key | readonly Key[] | undefined>();
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
+
+    const router = useRouter()
+    const pathname = usePathname()
+    const { createQueryString, getSearchParams } = useQueryParam();
+
+    const search = getSearchParams('search') ?? undefined;
+    const categoryFilter = getSearchParams('category');
+    const brandFilter = getSearchParams('brand');
+    const productFilter = getSearchParams('product');
+    const minPriceFilter = getSearchParams('minPrice');
+    const maxPriceFilter = getSearchParams('maxPrice');
 
     const isMD = useMediaQuery('(min-width: 768px)');
 
@@ -69,7 +76,7 @@ export default function Products() {
         page,
         limit,
         search,
-        categorieFilter,
+        categoryFilter,
         minPriceFilter,
         maxPriceFilter,
         brandFilter,
@@ -127,29 +134,32 @@ export default function Products() {
         } else return []
     }, [allProducts]);
 
+    const handleReplaceParams = (query: string) => {
+        router.replace(pathname + '?' + query, { scroll: false });
+    }
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value);
+        handleReplaceParams(createQueryString('search', e.target.value));
     };
 
     const handleMinPriceFilter = (value: number | null) => {
-        setMinPriceFilter(value);
+        handleReplaceParams(createQueryString('minPrice', value?.toString()));
     };
 
     const handleMaxPriceFilter = (value: number | null) => {
-        setMaxPriceFilter(value);
+        handleReplaceParams(createQueryString('maxPrice', value?.toString()));
     };
 
     const handleCategorieFilter = (value: string) => {
-        setCategorieFilter(value);
+        handleReplaceParams(createQueryString('category', value));
     };
 
     const handleBrandFilter = (value: string) => {
-        setBrandFilter(value);
+        handleReplaceParams(createQueryString('brand', value));
     };
 
     const handleProductFilter = (value: string) => {
-        setProductFilter(value);
+        handleReplaceParams(createQueryString('product', value));
     };
 
     const handlePagination: PaginationProps['onChange'] = (pageNumber) => {
@@ -182,7 +192,8 @@ export default function Products() {
                             <Input
                                 id="search"
                                 allowClear
-                                placeholder="Search by Product name"
+                                placeholder="By Product name"
+                                value={search}
                                 onChange={handleSearch}
                             />
                         </FormGroup>
@@ -200,6 +211,7 @@ export default function Products() {
                                 }
                                 onChange={handleCategorieFilter}
                                 options={categoriesOption}
+                                value={categoryFilter}
                                 loading={isLoadingCategories}
                             />
                         </FormGroup>
@@ -217,6 +229,7 @@ export default function Products() {
                                 }
                                 onChange={handleBrandFilter}
                                 options={brandsOption}
+                                value={brandFilter}
                                 loading={isLoadingAllProduct}
                             />
                         </FormGroup>
@@ -234,6 +247,7 @@ export default function Products() {
                                 }
                                 onChange={handleProductFilter}
                                 options={productsOption}
+                                value={productFilter}
                                 loading={isLoadingAllProduct}
                             />
                         </FormGroup>
@@ -243,7 +257,7 @@ export default function Products() {
                                 <InputNumber
                                     id="minPriceFilter"
                                     min={0}
-                                    value={minPriceFilter}
+                                    value={minPriceFilter ? Number(minPriceFilter) : null}
                                     onChange={handleMinPriceFilter}
                                     style={{ width: '100%' }}
                                 />
@@ -253,7 +267,7 @@ export default function Products() {
                                 <InputNumber
                                     id="maxPriceFilter"
                                     min={0}
-                                    value={maxPriceFilter}
+                                    value={maxPriceFilter ? Number(maxPriceFilter) : null}
                                     onChange={handleMaxPriceFilter}
                                     style={{ width: '100%' }}
                                 />

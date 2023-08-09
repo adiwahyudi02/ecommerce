@@ -10,14 +10,14 @@ interface IProductResponse {
 
 interface IProductParams {
     url: string;
-    limit?: number;
-    page?: number;
-    search?: string;
-    categorieFilter?: string;
-    minPriceFilter?: number | null,
-    maxPriceFilter?: number | null,
-    brandFilter?: string;
-    productFilter?: string;
+    limit?: number | string;
+    page?: number | string;
+    search?: string | null;
+    categoryFilter?: string | null;
+    minPriceFilter?: number | string | null,
+    maxPriceFilter?: number | string | null,
+    brandFilter?: string | null;
+    productFilter?: string | null;
     sortDirection?: SortOrder | undefined;
     sortField?: Key | readonly Key[] | undefined,
 }
@@ -27,7 +27,7 @@ const getProducts = async ({
     limit,
     page,
     search,
-    categorieFilter,
+    categoryFilter,
     minPriceFilter,
     maxPriceFilter,
     brandFilter,
@@ -40,7 +40,7 @@ const getProducts = async ({
             ...(!!page && { _page: page }),
             ...(!!limit && { _limit: limit }),
             ...(!!search && { title_like: search }),
-            ...(!!categorieFilter && { category: categorieFilter }),
+            ...(!!categoryFilter && { category: categoryFilter }),
             ...(!!minPriceFilter && { price_gte: minPriceFilter }),
             ...(!!maxPriceFilter && { price_lte: maxPriceFilter }),
             ...(!!brandFilter && { brand: brandFilter }),
