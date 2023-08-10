@@ -1,5 +1,6 @@
 'use client'
 
+export const dynamic = 'force-dynamic';
 import { useCategories } from '@/hooks/api/useCategories';
 import { useProducts } from '@/hooks/api/useProducts';
 import { IProduct } from '@/utils/type/product';
@@ -9,11 +10,11 @@ import { Input } from 'antd';
 import type { PaginationProps, TableProps } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { Key, SortOrder, SorterResult } from 'antd/es/table/interface';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { ExpandItem } from '@/components/Table/ExpandItem';
 import { FormGroup } from '@/components/Form/FormGroup';
 import { Label } from '@/components/Form/Label';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useQueryParam } from '@/hooks/useQueryParam';
 import ChartColumn from '@/components/Chart/ChartColumn';
 
@@ -60,16 +61,15 @@ export default function Products() {
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
 
-    const router = useRouter()
-    const pathname = usePathname()
+    const pathname = usePathname();
     const { createQueryString, getSearchParams } = useQueryParam();
 
-    const search = getSearchParams('search') ?? undefined;
-    const categoryFilter = getSearchParams('category');
-    const brandFilter = getSearchParams('brand');
-    const productFilter = getSearchParams('product');
-    const minPriceFilter = getSearchParams('minPrice');
-    const maxPriceFilter = getSearchParams('maxPrice');
+    const [search, setSearch] = useState<string | undefined>(undefined);
+    const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+    const [brandFilter, setBrandFilter] = useState<string | null>(null);
+    const [productFilter, setProductFilter] = useState<string | null>(null);
+    const [minPriceFilter, setMinPriceFilter] = useState<string | null>(null);
+    const [maxPriceFilter, setMaxPriceFilter] = useState<string | null>(null);
 
     const isMD = useMediaQuery('(min-width: 768px)');
 
@@ -153,30 +153,38 @@ export default function Products() {
     }, [allProducts]);
 
     const handleReplaceParams = (query: string) => {
-        router.replace(pathname + '?' + query, { scroll: false });
+        const newUrl = decodeURIComponent(`${pathname}?${query}`);
+        window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
     }
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        handleReplaceParams(createQueryString('search', e.target.value));
+        const value = e.target.value;
+        setSearch(value);
+        handleReplaceParams(createQueryString('search', value));
     };
 
-    const handleMinPriceFilter = (value: number | null) => {
+    const handleMinPriceFilter = (value: string | null) => {
+        setMinPriceFilter(value);
         handleReplaceParams(createQueryString('minPrice', value?.toString()));
     };
 
-    const handleMaxPriceFilter = (value: number | null) => {
+    const handleMaxPriceFilter = (value: string | null) => {
+        setMaxPriceFilter(value);
         handleReplaceParams(createQueryString('maxPrice', value?.toString()));
     };
 
     const handleCategorieFilter = (value: string) => {
+        setCategoryFilter(value);
         handleReplaceParams(createQueryString('category', value));
     };
 
     const handleBrandFilter = (value: string) => {
+        setBrandFilter(value);
         handleReplaceParams(createQueryString('brand', value));
     };
 
     const handleProductFilter = (value: string) => {
+        setProductFilter(value);
         handleReplaceParams(createQueryString('product', value));
     };
 
@@ -196,6 +204,15 @@ export default function Products() {
     const handleChangeTable: TableProps<IProduct>['onChange'] = (_, __, sorter) => {
         handleSorting(sorter);
     };
+
+    useEffect(() => {
+        setSearch(getSearchParams('search') ?? undefined);
+        setCategoryFilter(getSearchParams('category'));
+        setBrandFilter(getSearchParams('brand'));
+        setProductFilter(getSearchParams('product'));
+        setMinPriceFilter(getSearchParams('minPrice'));
+        setMaxPriceFilter(getSearchParams('maxPrice'));
+    }, []);
 
     return (
         <section className="flex flex-col gap-6">
@@ -283,8 +300,8 @@ export default function Products() {
                                 <Label htmlFor="minPriceFilter" text="Min Price" />
                                 <InputNumber
                                     id="minPriceFilter"
-                                    min={0}
-                                    value={minPriceFilter ? Number(minPriceFilter) : null}
+                                    min="0"
+                                    value={minPriceFilter}
                                     onChange={handleMinPriceFilter}
                                     style={{ width: '100%' }}
                                 />
@@ -293,8 +310,8 @@ export default function Products() {
                                 <Label htmlFor="maxPriceFilter" text="Max Price" />
                                 <InputNumber
                                     id="maxPriceFilter"
-                                    min={0}
-                                    value={maxPriceFilter ? Number(maxPriceFilter) : null}
+                                    min="0"
+                                    value={maxPriceFilter}
                                     onChange={handleMaxPriceFilter}
                                     style={{ width: '100%' }}
                                 />
