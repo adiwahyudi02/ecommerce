@@ -159,34 +159,42 @@ export default function Products() {
         window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
     }
 
+    const handleResetPage = () => setPage(1);
+
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearch(value);
+        handleResetPage();
         handleReplaceParams(createQueryString('search', value));
     };
 
     const handleMinPriceFilter = (value: string | null) => {
         setMinPriceFilter(value);
+        handleResetPage();
         handleReplaceParams(createQueryString('minPrice', value?.toString()));
     };
 
     const handleMaxPriceFilter = (value: string | null) => {
         setMaxPriceFilter(value);
+        handleResetPage();
         handleReplaceParams(createQueryString('maxPrice', value?.toString()));
     };
 
     const handleCategorieFilter = (value: string) => {
         setCategoryFilter(value);
+        handleResetPage();
         handleReplaceParams(createQueryString('category', value));
     };
 
     const handleBrandFilter = (value: string) => {
         setBrandFilter(value);
+        handleResetPage();
         handleReplaceParams(createQueryString('brand', value));
     };
 
     const handleProductFilter = (value: string) => {
         setProductFilter(value);
+        handleResetPage();
         handleReplaceParams(createQueryString('product', value));
     };
 
