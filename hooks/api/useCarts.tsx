@@ -13,7 +13,8 @@ interface ICartParams {
     limit?: number | string;
     page?: number | string;
     sortDirection?: SortOrder | undefined;
-    sortField?: Key | readonly Key[] | undefined,
+    sortField?: Key | readonly Key[] | undefined;
+    search?: string | null;
 }
 
 const getCarts = async ({
@@ -22,6 +23,7 @@ const getCarts = async ({
     page,
     sortDirection,
     sortField,
+    search,
 }: ICartParams): Promise<ICartResponse> => {
     try {
         const params = {
@@ -31,6 +33,7 @@ const getCarts = async ({
                 _order: sortDirection === 'ascend' ? 'asc' : 'desc',
                 _sort: sortField,
             }),
+            ...(!!search && { userName_like: search }),
         };
         const { data, headers } = await axiosInstance.get(url, { params });
 

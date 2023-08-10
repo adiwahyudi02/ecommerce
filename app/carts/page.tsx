@@ -2,14 +2,18 @@
 
 import { ICart } from '@/utils/type/carts';
 import useMediaQuery from '@/hooks/useMediaQuery';
-import { Table, Pagination, Card, Button } from 'antd';
+import { Table, Pagination, Card, Button, Input } from 'antd';
 import type { PaginationProps, TableProps } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { Key, SortOrder, SorterResult } from 'antd/es/table/interface';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ExpandItem } from '@/components/Table/ExpandItem';
 import { useCarts } from '@/hooks/api/useCarts';
 import Link from 'next/link';
+import { FormGroup } from '@/components/Form/FormGroup';
+import { Label } from '@/components/Form/Label';
+import { usePathname } from 'next/navigation';
+import { useQueryParam } from '@/hooks/useQueryParam';
 
 const ActionButtons = ({ value }: { value: string }) => (
     <Link href={`/carts/${value}`}>
@@ -20,12 +24,9 @@ const ActionButtons = ({ value }: { value: string }) => (
 const columns: ColumnsType<ICart> = [
     {
         title: 'User',
-        dataIndex: 'userId',
-        key: 'userId',
+        dataIndex: 'userName',
+        key: 'userName',
         sorter: true,
-        render(value) {
-            return `User${value}`
-        },
     },
     {
         title: 'Total Products',
@@ -71,15 +72,26 @@ export default function Carts() {
     const [sortField, setSortField] = useState<Key | readonly Key[] | undefined>();
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(10);
+    const [search, setSearch] = useState<string | undefined>(undefined);
 
     const isMD = useMediaQuery('(min-width: 768px)');
+    const pathname = usePathname();
+    const { createQueryString, getSearchParams } = useQueryParam();
 
     const { data: carts, isLoading: isLoadingCarts } = useCarts({
+        search,
         page,
         limit,
         sortDirection,
         sortField,
     });
+
+    const handleReplaceParams = (query: string) => {
+        const newUrl = decodeURIComponent(`${pathname}?${query}`);
+        window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
+    }
+
+    const handleResetPage = () => setPage(1);
 
     const handlePagination: PaginationProps['onChange'] = (pageNumber) => {
         setPage(pageNumber);
@@ -98,12 +110,35 @@ export default function Carts() {
         handleSorting(sorter);
     };
 
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearch(value);
+        handleResetPage();
+        handleReplaceParams(createQueryString('search', value));
+    };
+
+    useEffect(() => {
+        setSearch(getSearchParams('search') ?? undefined);
+    }, []);
+
     return (
         <section className="flex flex-col gap-6">
             <Card>
                 <h1 className="text-xl font-bold mt-5 mb-10 text-indigo-800">
                     Carts
                 </h1>
+                <div className="w-80 flex justify-end mb-10">
+                    <FormGroup>
+                        <Label htmlFor="search" text="Search" />
+                        <Input
+                            id="search"
+                            allowClear
+                            placeholder="By user"
+                            value={search}
+                            onChange={handleSearch}
+                        />
+                    </FormGroup>
+                </div>
                 <Table
                     rowKey="id"
                     columns={columns}
