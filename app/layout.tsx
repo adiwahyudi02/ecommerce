@@ -27,10 +27,12 @@ export default function RootLayout({ children }: IRootLayoutProps) {
                         },
                     }}
                 >
-                    <body className={`${inter.className} block lg:flex gap-6 p-3 sm:p-5 bg-gray-100`}>
+                    <body className={`${inter.className} p-3 sm:p-5 bg-gray-100`}>
                         <Sidebar />
-                        <main className="flex-1 w-full lg:ml-[320px]">
-                            {children}
+                        <main className="flex-1 w-full lg:flex lg:justify-end">
+                            <div className="lg:w-[calc(100%-316px)]">
+                                {children}
+                            </div>
                         </main>
                     </body>
                 </ConfigProvider>
