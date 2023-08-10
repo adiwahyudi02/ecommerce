@@ -7,6 +7,7 @@ import { ColumnsType } from 'antd/es/table';
 import { ExpandItem } from '@/components/Table/ExpandItem';
 import { useCartDetails } from '@/hooks/api/useCartDetails';
 import { BackButton } from '@/components/BackButton';
+import moment from 'moment';
 
 const columns: ColumnsType<IProductCart> = [
     {
@@ -70,11 +71,11 @@ export default function CartDetails({ params }: { params: { id: string } }) {
                                 <div className="w-1/2">
                                     <div className="flex items-center gap-3 my-3">
                                         <p className="font-bold">User:</p>
-                                        <p>User{details?.userId}</p>
+                                        <p>{details?.userName}</p>
                                     </div>
                                     <div className="flex items-center gap-3 my-3">
                                         <p className="font-bold">Added On:</p>
-                                        <p>20 Jan 2022</p>
+                                        <p>{moment(details?.date, 'DD-MM-YYYY').format('D MMMM YYYY')}</p>
                                     </div>
                                 </div>
                                 <div className="block sm:none">
