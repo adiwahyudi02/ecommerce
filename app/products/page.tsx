@@ -146,7 +146,9 @@ export default function Products() {
                 return a;
             }, {});
 
-            const countsExtended = Object.keys(counts).map(i => ({ brand: i, count: counts[i] }));
+            const countsExtended = Object.keys(counts)
+                .map(i => ({ brand: i, count: counts[i] }))
+                .sort((a, b) => (a.brand > b.brand) ? 1 : ((b.brand > a.brand) ? -1 : 0))
 
             return countsExtended;
         } else return []
