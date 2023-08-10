@@ -4,7 +4,7 @@ import { useCategories } from '@/hooks/api/useCategories';
 import { useProducts } from '@/hooks/api/useProducts';
 import { IProduct } from '@/utils/type/product';
 import useMediaQuery from '@/hooks/useMediaQuery';
-import { Table, Pagination, Card, Select, InputNumber, theme } from 'antd';
+import { Table, Pagination, Card, Select, InputNumber } from 'antd';
 import { Input } from 'antd';
 import type { PaginationProps, TableProps } from 'antd';
 import { ColumnsType } from 'antd/es/table';
@@ -15,9 +15,7 @@ import { FormGroup } from '@/components/Form/FormGroup';
 import { Label } from '@/components/Form/Label';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useQueryParam } from '@/hooks/useQueryParam';
-import { Column } from '@ant-design/plots';
-
-const { useToken } = theme;
+import ChartColumn from '@/components/Chart/ChartColumn';
 
 const columns: ColumnsType<IProduct> = [
     {
@@ -74,7 +72,6 @@ export default function Products() {
     const maxPriceFilter = getSearchParams('maxPrice');
 
     const isMD = useMediaQuery('(min-width: 768px)');
-    const { token } = useToken();
 
     const { data: products, isLoading } = useProducts({
         page,
@@ -206,26 +203,12 @@ export default function Products() {
                 <h1 className="text-xl font-bold mt-5 mb-10 text-indigo-800">
                     Products
                 </h1>
-                <Column
+                <ChartColumn
                     data={chartData}
                     xField="brand"
                     yField="count"
-                    xAxis={{
-                        label: {
-                            autoHide: false,
-                            autoRotate: true,
-                        },
-                    }}
-                    label={{
-                        position: 'middle',
-                        style: {
-                            fill: '#FFFFFF'
-                        },
-                    }}
-                    scrollbar={{
-                        type: 'horizontal'
-                    }}
-                    color={token.colorPrimary}
+                    isLoading={isLoadingAllProduct}
+                    isScrollbar
                 />
             </Card>
             <Card>
