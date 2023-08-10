@@ -3,7 +3,7 @@ import SidebarMobile from './SidebarMobile';
 
 export default function Sidebar() {
     return (
-        <aside>
+        <aside className="lg:fixed lg:z-10 lg:h-[calc(100%-40px)]">
             <div className="h-full hidden lg:block">
                 <SidebarDesktop />
             </div>
