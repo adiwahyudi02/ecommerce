@@ -16,4 +16,6 @@ export interface ICart {
     totalProducts: number;
     totalQuantity: number;
     products: IProductCart[];
+    userName: string;
+    date: string;
 }
