@@ -47,7 +47,7 @@ export default function SidebarMobile() {
                                 </div>
                             </div>
                             <div className="m-5 mt-20">
-                                <SidebarItem />
+                                <SidebarItem closeSidebar={() => setIsOpen(false)} />
                             </div>
                         </motion.div>
 

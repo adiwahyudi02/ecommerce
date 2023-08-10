@@ -4,8 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { sidebarRoute } from './utils/constant';
 
+interface ISidebarItem {
+    closeSidebar?: () => void;
+}
 
-export default function SidebarItem() {
+export default function SidebarItem({ closeSidebar }: ISidebarItem) {
     const pathname = usePathname();
 
     return (
@@ -15,12 +18,13 @@ export default function SidebarItem() {
                     <Link
                         href={item.route}
                         className="group"
+                        onClick={() => !!closeSidebar && closeSidebar()}
                     >
-                        <div className={`flex justify-start items-center transition duration-150 group-hover:bg-indigo-500 p-3 rounded ${pathname === item.route ? 'bg-indigo-500' : 'bg-white'}`}>
-                            <div className={`group-hover:text-white mr-3 ${pathname === item.route ? 'text-white' : 'text-indigo-700'}`}>
+                        <div className={`flex justify-start items-center transition duration-150 group-hover:bg-indigo-500 p-3 rounded ${pathname.includes(item.route) ? 'bg-indigo-500' : 'bg-white'}`}>
+                            <div className={`group-hover:text-white mr-3 ${pathname.includes(item.route) ? 'text-white' : 'text-indigo-700'}`}>
                                 {item.icon}
                             </div>
-                            <p className={`group-hover:text-white text-sm ${pathname === item.route ? 'text-white' : 'text-indigo-700'}`}>
+                            <p className={`group-hover:text-white text-sm ${pathname.includes(item.route) ? 'text-white' : 'text-indigo-700'}`}>
                                 {item.title}
                             </p>
                         </div>
