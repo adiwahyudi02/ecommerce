@@ -57,7 +57,7 @@ export default function CartDetails({ params }: { params: { id: string } }) {
             <Card>
                 <BackButton href="/carts" />
                 <h1 className="text-xl font-bold my-10 text-indigo-800 ml-2">
-                    Carts {params.id}
+                    Cart {params.id}
                 </h1>
                 <div className="mb-12">
                     <h2 className="text-base font-bold text-indigo-800 mb-6 ml-2">
