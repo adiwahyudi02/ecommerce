@@ -152,7 +152,7 @@ export default function Products() {
             }, {});
 
             const countsExtended = Object.keys(counts)
-                .map(i => ({ brand: i, count: counts[i] }))
+                .map(i => ({ brand: i, products: counts[i] }))
                 .sort((a, b) => (a.brand > b.brand) ? 1 : ((b.brand > a.brand) ? -1 : 0))
 
             return countsExtended;
@@ -289,7 +289,7 @@ export default function Products() {
                 <ChartColumn
                     data={chartDataFiltered}
                     xField="brand"
-                    yField="count"
+                    yField="products"
                     isLoading={isLoadingAllProduct}
                     isScrollbar
                 />
