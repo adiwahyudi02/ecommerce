@@ -264,8 +264,11 @@ export default function Products() {
                 <h1 className="text-xl font-bold mt-5 mb-10 text-indigo-800">
                     Products
                 </h1>
+                <h2 className="text-base font-bold text-indigo-800 mb-6">
+                    Brand Chart
+                </h2>
                 <div className="flex justify-start mb-10">
-                    <div className="w-80">
+                    <div className="w-full sm:w-80">
                         <FormGroup>
                             <Select
                                 mode="multiple"
@@ -295,6 +298,9 @@ export default function Products() {
                 />
             </Card>
             <Card>
+                <h2 className="text-base font-bold text-indigo-800 mb-6">
+                    Product List
+                </h2>
                 <div>
                     <div className="flex flex-col md:flex-row justify-between items-end gap-6 mb-10">
                         <FormGroup>
