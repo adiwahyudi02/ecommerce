@@ -74,6 +74,7 @@ export default function Products() {
     const [minPriceFilterDebounced, setMinPriceFilterDebounced] = useState<string | null>(null);
     const [maxPriceFilterDebounced, setMaxPriceFilterDebounced] = useState<string | null>(null);
     const [searchDebounced, setSearchDebounced] = useState<string | undefined>(undefined);
+    const [chartFilterByBrand, setChartFilterByBrand] = useState<string[] | null | undefined>([]);
 
     const isMD = useMediaQuery('(min-width: 768px)');
 
@@ -158,6 +159,11 @@ export default function Products() {
         } else return []
     }, [allProducts]);
 
+    const chartDataFiltered = useMemo(() => {
+        if (!chartFilterByBrand?.length) return chartData;
+        return chartData.filter(item => chartFilterByBrand?.includes(item.brand));
+    }, [chartData, chartFilterByBrand]);
+
     const handleReplaceParams = (query: string) => {
         const newUrl = decodeURIComponent(`${pathname}?${query}`);
         window.history.replaceState({ ...window.history.state, as: newUrl, url: newUrl }, '', newUrl);
@@ -234,6 +240,11 @@ export default function Products() {
         handleSorting(sorter);
     };
 
+    const handleChartFilterByBrand = (value: string[]) => {
+        setChartFilterByBrand(value);
+        handleReplaceParams(createQueryString('chartByBrand', value, { encode: true }));
+    };
+
     useEffect(() => {
         setSearch(getSearchParams('search') ?? undefined);
         setSearchDebounced(getSearchParams('search') ?? undefined);
@@ -244,6 +255,7 @@ export default function Products() {
         setMaxPriceFilter(getSearchParams('maxPrice'));
         setMinPriceFilterDebounced(getSearchParams('minPrice'));
         setMaxPriceFilterDebounced(getSearchParams('maxPrice'));
+        setChartFilterByBrand(getSearchParams('chartByBrand', { decode: true }) ?? []);
     }, []);
 
     return (
@@ -252,8 +264,30 @@ export default function Products() {
                 <h1 className="text-xl font-bold mt-5 mb-10 text-indigo-800">
                     Products
                 </h1>
+                <div className="flex justify-start mb-10">
+                    <div className="w-80">
+                        <FormGroup>
+                            <Select
+                                mode="multiple"
+                                allowClear
+                                showSearch
+                                id="chartFilterByBrand"
+                                placeholder="Select Brand"
+                                optionFilterProp="children"
+                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input)}
+                                filterSort={(optionA, optionB) =>
+                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                }
+                                onChange={handleChartFilterByBrand}
+                                options={brandsOption}
+                                value={chartFilterByBrand}
+                                loading={isLoadingAllProduct}
+                            />
+                        </FormGroup>
+                    </div>
+                </div>
                 <ChartColumn
-                    data={chartData}
+                    data={chartDataFiltered}
                     xField="brand"
                     yField="count"
                     isLoading={isLoadingAllProduct}
