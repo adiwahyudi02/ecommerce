@@ -277,7 +277,7 @@ export default function Products() {
                                 id="chartFilterByBrand"
                                 placeholder="Select Brand"
                                 optionFilterProp="children"
-                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input)}
+                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())}
                                 filterSort={(optionA, optionB) =>
                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                 }
@@ -321,7 +321,7 @@ export default function Products() {
                                 id="categorieFilter"
                                 placeholder="Select "
                                 optionFilterProp="children"
-                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input)}
+                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())}
                                 filterSort={(optionA, optionB) =>
                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                 }
@@ -339,7 +339,7 @@ export default function Products() {
                                 id="brandFilter"
                                 placeholder="Select "
                                 optionFilterProp="children"
-                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input)}
+                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())}
                                 filterSort={(optionA, optionB) =>
                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                 }
@@ -357,7 +357,7 @@ export default function Products() {
                                 id="productFilter"
                                 placeholder="Select "
                                 optionFilterProp="children"
-                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input)}
+                                filterOption={(input, option) => (option?.label.toLowerCase() ?? '').includes(input.toLowerCase())}
                                 filterSort={(optionA, optionB) =>
                                     (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                 }
