@@ -242,7 +242,7 @@ export default function Products() {
 
     const handleChartFilterByBrand = (value: string[]) => {
         setChartFilterByBrand(value);
-        handleReplaceParams(createQueryString('chartByBrand', value, { encode: true }));
+        handleReplaceParams(createQueryString('chartByBrand', value));
     };
 
     useEffect(() => {
