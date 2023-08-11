@@ -135,7 +135,7 @@ export default function Carts() {
                 <h1 className="text-xl font-bold mt-5 mb-10 text-indigo-800">
                     Carts
                 </h1>
-                <div className="w-80 flex justify-end mb-10">
+                <div className="w-full sm:w-80 flex justify-end mb-10">
                     <FormGroup>
                         <Label htmlFor="search" text="Search" />
                         <Input
