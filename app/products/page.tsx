@@ -10,13 +10,14 @@ import { Input } from 'antd';
 import type { PaginationProps, TableProps } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import { Key, SortOrder, SorterResult } from 'antd/es/table/interface';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { ExpandItem } from '@/components/Table/ExpandItem';
 import { FormGroup } from '@/components/Form/FormGroup';
 import { Label } from '@/components/Form/Label';
 import { usePathname } from 'next/navigation';
 import { useQueryParam } from '@/hooks/useQueryParam';
 import ChartColumn from '@/components/Chart/ChartColumn';
+import debounce from 'lodash.debounce';
 
 const columns: ColumnsType<IProduct> = [
     {
@@ -70,16 +71,19 @@ export default function Products() {
     const [productFilter, setProductFilter] = useState<string | null>(null);
     const [minPriceFilter, setMinPriceFilter] = useState<string | null>(null);
     const [maxPriceFilter, setMaxPriceFilter] = useState<string | null>(null);
+    const [minPriceFilterDebounced, setMinPriceFilterDebounced] = useState<string | null>(null);
+    const [maxPriceFilterDebounced, setMaxPriceFilterDebounced] = useState<string | null>(null);
+    const [searchDebounced, setSearchDebounced] = useState<string | undefined>(undefined);
 
     const isMD = useMediaQuery('(min-width: 768px)');
 
     const { data: products, isLoading } = useProducts({
         page,
         limit,
-        search,
+        search: searchDebounced,
         categoryFilter,
-        minPriceFilter,
-        maxPriceFilter,
+        minPriceFilter: minPriceFilterDebounced,
+        maxPriceFilter: maxPriceFilterDebounced,
         brandFilter,
         productFilter,
         sortDirection,
@@ -161,23 +165,38 @@ export default function Products() {
 
     const handleResetPage = () => setPage(1);
 
+    const handleSearchDebounce = useCallback(debounce((value: string) => {
+        setSearchDebounced(value);
+        handleResetPage();
+        handleReplaceParams(createQueryString('search', value));
+    }, 1000), []);
+
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearch(value);
-        handleResetPage();
-        handleReplaceParams(createQueryString('search', value));
+        handleSearchDebounce(value);
     };
+
+    const handleMinPriceFilterDebounce = useCallback(debounce((value: string | null) => {
+        setMinPriceFilterDebounced(value);
+        handleResetPage();
+        handleReplaceParams(createQueryString('minPrice', value?.toString()));
+    }, 1000), []);
 
     const handleMinPriceFilter = (value: string | null) => {
         setMinPriceFilter(value);
-        handleResetPage();
-        handleReplaceParams(createQueryString('minPrice', value?.toString()));
+        handleMinPriceFilterDebounce(value);
     };
+
+    const handleMaxPriceFilterDebounce = useCallback(debounce((value: string | null) => {
+        setMaxPriceFilterDebounced(value);
+        handleResetPage();
+        handleReplaceParams(createQueryString('maxPrice', value?.toString()));
+    }, 1000), []);
 
     const handleMaxPriceFilter = (value: string | null) => {
         setMaxPriceFilter(value);
-        handleResetPage();
-        handleReplaceParams(createQueryString('maxPrice', value?.toString()));
+        handleMaxPriceFilterDebounce(value);
     };
 
     const handleCategorieFilter = (value: string) => {
@@ -217,11 +236,14 @@ export default function Products() {
 
     useEffect(() => {
         setSearch(getSearchParams('search') ?? undefined);
+        setSearchDebounced(getSearchParams('search') ?? undefined);
         setCategoryFilter(getSearchParams('category'));
         setBrandFilter(getSearchParams('brand'));
         setProductFilter(getSearchParams('product'));
         setMinPriceFilter(getSearchParams('minPrice'));
         setMaxPriceFilter(getSearchParams('maxPrice'));
+        setMinPriceFilterDebounced(getSearchParams('minPrice'));
+        setMaxPriceFilterDebounced(getSearchParams('maxPrice'));
     }, []);
 
     return (
